@@ -6,9 +6,11 @@ import re
 import csv
 import hashlib
 import shutil
+import os
 
 books_links = []
 books_results = []
+os.mkdir('Images')
 
 start_url = 'http://books.toscrape.com/catalogue/category/books_1/index.html'
 response = requests.get(start_url)
@@ -103,7 +105,7 @@ def image_manager(item):
     r = requests.get(image_url, stream=True)
     if r.ok:
         r.raw.decode_content = True
-        with open(item['image']+'.jpg', 'wb') as f:
+        with open('Images/' + item['image']+'.jpg', 'wb') as f:
             shutil.copyfileobj(r.raw, f)
 
 
