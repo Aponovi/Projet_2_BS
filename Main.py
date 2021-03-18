@@ -4,6 +4,8 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import csv
+import hashlib
+import shutil
 
 books_links = []
 books_results = []
@@ -50,32 +52,24 @@ def description_book(url):
         review_rating = review_rating.replace(
             "One", "1").replace("Two", "2").replace("Three", "3").replace("Four", "4").replace("Five", "5")
         image_url = soup_book.find('img').attrs['src'].replace('../../', 'http://books.toscrape.com/')
-
-        books_results.append({'product_page_url': product_page_url,
-                              'universal_product_code (upc)': upc,
-                              'title': title,
-                              'price_including_tax': price_including_tax,
-                              'price_excluding_tax': price_excluding_tax,
-                              'number_available': number_available,
-                              'product_description': product_description,
-                              'category': category,
-                              'review_rating': review_rating,
-                              'image_url': image_url,
-                              })
-        csvmanager({'product_page_url': product_page_url,
-                    'universal_product_code (upc)': upc,
-                    'title': title,
-                    'price_including_tax': price_including_tax,
-                    'price_excluding_tax': price_excluding_tax,
-                    'number_available': number_available,
-                    'product_description': product_description,
-                    'category': category,
-                    'review_rating': review_rating,
-                    'image_url': image_url,
-                    })
+        book = {'product_page_url': product_page_url,
+                'universal_product_code (upc)': upc,
+                'title': title,
+                'price_including_tax': price_including_tax,
+                'price_excluding_tax': price_excluding_tax,
+                'number_available': number_available,
+                'product_description': product_description,
+                'category': category,
+                'review_rating': review_rating,
+                'image_url': image_url,
+                'image': hashlib.sha1(image_url.encode('utf-8')).hexdigest()
+                }
+        books_results.append(book)
+        csv_manager(book)
+        image_manager(book)
 
 
-def csvmanager(item):
+def csv_manager(item):
     vide = False
     with open(item["category"] + '.csv', 'a', newline='') as file:
         pass
@@ -97,15 +91,22 @@ def csvmanager(item):
             'category',
             'review_rating',
             'image_url',
-            # 'images'
-        ])
+            'image'])
         if vide:
             writer.writeheader()
         writer.writerow(item)
     return item
 
 
-# description_book('http://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html')
+def image_manager(item):
+    image_url = item['image_url']
+    r = requests.get(image_url, stream=True)
+    if r.ok:
+        r.raw.decode_content = True
+        with open(item['image']+'.jpg', 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+
+
 list_books('http://books.toscrape.com/catalogue/category/books_1/index.html')
 print(books_results)
 print(len(books_results))
