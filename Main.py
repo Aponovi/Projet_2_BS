@@ -110,5 +110,4 @@ def image_manager(item):
 
 
 list_books('http://books.toscrape.com/catalogue/category/books_1/index.html')
-print(books_results)
 print(len(books_results))
