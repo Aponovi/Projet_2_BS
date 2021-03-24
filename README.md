@@ -6,13 +6,19 @@ Programme créé dans le cadre du parcours Développeur d'Application Python che
 ## Installation
 
 Installation des dépendances dans un environnement virtuel:
-  virtualenv env && source env/bin/activate
-  pip install -r requirements.txt
+
+`  virtualenv env && source env/bin/activate
+`
+
+`  pip install -r requirements.txt
+`
   
 ## Démarrage
 
-Lancer le Main.
+Lancer le main:
 
+`  main.py
+`
 ## Résultats
 
 Les données des livres sont stockées au format .csv par catégorie.
